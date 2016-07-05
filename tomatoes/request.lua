@@ -1,7 +1,7 @@
 local module = {}
 
 function module.post(data)
-    http.post(config.API_URL,
+    http.post(local_config.API_URL,
         'Content-Type: application/json\nAccept: application/json\n',
         data,
         function(code, data)

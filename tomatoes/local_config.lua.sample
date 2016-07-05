@@ -1,0 +1,7 @@
+local module = {}
+
+module.SSID = {}
+module.SSID["WIFI_SSID"] = "password"
+module.API_URL = "http://192.168.0.50:3000/data"
+
+return module

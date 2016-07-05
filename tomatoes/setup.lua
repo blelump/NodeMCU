@@ -52,6 +52,7 @@ local function configure_pins()
     gpio.mode(config.DHT_PIN, gpio.OUTPUT)
     gpio.mode(config.LED_PIN, gpio.OUTPUT)
     gpio.mode(config.YL_PIN, gpio.OUTPUT)
+    gpio.mode(config.CMW_PIN, gpio.INPUT)
 end
 
 function module.start()

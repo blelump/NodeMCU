@@ -2,7 +2,7 @@
 local module = {}
 
 module.SSID = {}
-module.SSID["UPC1391359"] = "ZESZJPXE"
+-- module.SSID["WIFI_SSID"] = "password"
 module.DHT_PIN = 3
 module.LED_PIN = 4
 module.YL_PIN = 5

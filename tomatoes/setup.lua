@@ -61,6 +61,8 @@ function module.start()
   print("Configuring Wifi ...")
   wifi.setmode(wifi.STATION);
   wifi.sta.getap(wifi_start)
+  print('Configuring soil_humidity module (ADC)')
+  soil_humidity.setup()
 end
 
 return module

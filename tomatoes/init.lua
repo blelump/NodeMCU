@@ -1,11 +1,14 @@
-local_config = require("local_config")
+function unrequire(m)
+    package.loaded[m] = nil
+    _G[m] = nil
+end
+
 config = require("config")
-stats = require("stats")
-request = require("request")
-soil_humidity = require("soil_humidity")
-app = require("app")
-setup = require("setup")
-barrel = require("barrel")
+local setup = require("setup")
+local soil_humidity = require("soil_humidity")
 
-
+soil_humidity.setup()
 setup.start()
+
+unrequire("setup")
+unrequire("soil_humidity")

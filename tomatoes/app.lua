@@ -1,10 +1,13 @@
 -- file : application.lua
 local module = {}
+local barrel = require("barrel")
+local soil_humidity = require("soil_humidity")
+local request = require("request")
 
 local function measure_dht_22()
 
     tmr.alarm(0, config.DHT_INTERVAL, tmr.ALARM_AUTO, function()
-         status, temp, humi, temp_dec, humi_dec = dht.readxx(config.DHT_PIN)
+         local status, temp, humi, temp_dec, humi_dec = dht.readxx(config.DHT_PIN)
          if status == dht.OK then
              -- Float firmware using this example
              print("DHT Temperature:"..temp.."; ".."Humidity:"..humi)

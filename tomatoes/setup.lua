@@ -1,5 +1,7 @@
 -- file: setup.lua
 local module = {}
+local local_config = require("local_config")
+local app = require("app")
 
 local function blink()
     local state = gpio.HIGH
@@ -39,7 +41,7 @@ local function wifi_start(list_aps)
                 wifi.sta.config(key,local_config.SSID[key])
                 wifi.sta.connect()
                 print("Connecting to " .. key .. " ...")
-                --config.SSID = nil  -- can save memory
+                local_config.SSID = nil  -- can save memory
                 tmr.alarm(1, 2500, 1, wifi_wait_ip)
             end
         end
@@ -64,7 +66,6 @@ function module.start()
   wifi.setmode(wifi.STATION);
   wifi.sta.getap(wifi_start)
   print('Configuring soil_humidity module (ADC)')
-  soil_humidity.setup()
 end
 
 return module

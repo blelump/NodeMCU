@@ -4,6 +4,8 @@ local barrel = require("barrel")
 local soil_humidity = require("soil_humidity")
 local request = require("request")
 
+module.performing_water = false
+
 local function measure_dht_22()
 
     tmr.alarm(0, config.DHT_INTERVAL, tmr.ALARM_AUTO, function()
@@ -27,18 +29,23 @@ end
 local function start_measurements()
     tmr.alarm(1, config.YL_INTERVAL, tmr.ALARM_AUTO, function()
         soil_humidity.measure()
-        if soil_humidity.enough_measurements and barrel.has_water() then
-            print("has enough measurements and has water...")
-            gpio.write(config.RELAY_PIN, gpio.HIGH)
-            local running, mode = tmr.state(3)
-            if not running then
-                tmr.alarm(3, 6000, tmr.ALARM_SINGLE, function()
-                    print('alarm!!!!')
-                    gpio.write(config.RELAY_PIN, gpio.LOW)
-                end)
+        if soil_humidity.need_water() then
+            if barrel.has_water() then
+                print("has enough measurements...")
+
+                gpio.write(config.RELAY_PIN, gpio.HIGH)
+                local running, mode = tmr.state(3)
+                if not running then
+                    tmr.alarm(3, 6000, tmr.ALARM_SINGLE, function()
+                        soil_humidity.reset()
+                        gpio.write(config.RELAY_PIN, gpio.LOW)
+                    end)
+                end
+            else
+                print("has not enough water...")
             end
         else
-            print("has not enough measurements or water...")
+            print("has not enough measurements...")
         end
     end)
 end

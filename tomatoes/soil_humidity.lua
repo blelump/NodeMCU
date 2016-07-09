@@ -2,8 +2,6 @@ local module = {}
 local stats = require("stats")
 local request = require("request")
 
-module.mean_humidity = 0
-module.enough_measurements = false
 
 local function mean_avg(humidity)
     module.mean_humidity = stats.compute_10_args_mean(humidity)
@@ -19,6 +17,17 @@ local function ensure_enough_measurements()
     else
         module.min_measurements = module.min_measurements - 1
     end
+end
+
+function module.need_water()
+    return module.enough_measurements and
+        module.mean_humidity < config.MIN_HUMIDITY
+end
+
+function module.reset()
+    module.min_measurements = config.MEASUREMENT_COUNT
+    module.enough_measurements = false
+    module.mean_humidity = 0
 end
 
 function module.measure()
@@ -39,7 +48,7 @@ function module.measure()
 end
 
 function module.setup()
-    module.min_measurements = config.MEASUREMENT_COUNT
+    module.reset()
     adc.force_init_mode(adc.INIT_ADC)
 end
 

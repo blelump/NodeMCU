@@ -9,6 +9,7 @@ module.RELAY_PIN = 7
 module.DHT_INTERVAL = 65000
 module.YL_INTERVAL = 60000
 module.MEASUREMENT_COUNT = 12
+module.MIN_HUMIDITY = 150
 
 
 return module

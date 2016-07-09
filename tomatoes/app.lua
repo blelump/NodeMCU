@@ -36,7 +36,7 @@ local function start_measurements()
                 gpio.write(config.RELAY_PIN, gpio.HIGH)
                 local running, mode = tmr.state(3)
                 if not running then
-                    tmr.alarm(3, 6000, tmr.ALARM_SINGLE, function()
+                    tmr.alarm(3, config.IRRIGATION_INTERVAL, tmr.ALARM_SINGLE, function()
                         soil_humidity.reset()
                         gpio.write(config.RELAY_PIN, gpio.LOW)
                     end)

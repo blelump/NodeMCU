@@ -1,6 +1,7 @@
 -- file : config.lua
 local module = {}
 
+module.MEASURE_ONLY_MODE_PIN = 2
 module.DHT_PIN = 3
 module.LED_PIN = 4
 module.YL_PIN = 5

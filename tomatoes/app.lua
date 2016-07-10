@@ -29,23 +29,28 @@ end
 local function start_measurements()
     tmr.alarm(1, config.YL_INTERVAL, tmr.ALARM_AUTO, function()
         soil_humidity.measure()
-        if soil_humidity.need_water() then
-            if barrel.has_water() then
-                print("has enough measurements...")
+        local measure_only_mode = (gpio.read(config.MEASURE_ONLY_MODE_PIN) == 0 )
+        if measure_only_mode then
+            print('measure only mode')
+        else
+            if soil_humidity.need_water() then
+                if barrel.has_water() then
+                    print("has enough measurements...")
 
-                gpio.write(config.RELAY_PIN, gpio.HIGH)
-                local running, mode = tmr.state(3)
-                if not running then
-                    tmr.alarm(3, config.IRRIGATION_INTERVAL, tmr.ALARM_SINGLE, function()
-                        soil_humidity.reset()
-                        gpio.write(config.RELAY_PIN, gpio.LOW)
-                    end)
+                    gpio.write(config.RELAY_PIN, gpio.HIGH)
+                    local running, mode = tmr.state(3)
+                    if not running then
+                        tmr.alarm(3, config.IRRIGATION_INTERVAL, tmr.ALARM_SINGLE, function()
+                            soil_humidity.reset()
+                            gpio.write(config.RELAY_PIN, gpio.LOW)
+                        end)
+                    end
+                else
+                    print("has not enough water...")
                 end
             else
-                print("has not enough water...")
+                print("has not enough measurements...")
             end
-        else
-            print("has not enough measurements...")
         end
     end)
 end

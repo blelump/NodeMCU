@@ -57,6 +57,7 @@ local function configure_pins()
     gpio.mode(config.CMW_PIN, gpio.INPUT, gpio.PULLUP)
     gpio.mode(config.RELAY_PIN, gpio.OUTPUT)
     gpio.write(config.RELAY_PIN, gpio.LOW)
+    gpio.mode(config.MEASURE_ONLY_MODE_PIN, gpio.INPUT, gpio.PULLUP)
 end
 
 function module.start()

@@ -2,7 +2,7 @@
 local module = {}
 local barrel = require("barrel")
 local soil_humidity = require("soil_humidity")
-local request = require("request")
+local database = require("database")
 
 module.performing_water = false
 
@@ -14,9 +14,8 @@ local function measure_dht_22()
              -- Float firmware using this example
              print("DHT Temperature:"..temp.."; ".."Humidity:"..humi)
 
-             request.post([[{"data": {"dht":{"temperature": "]]..temp..[[",
-                          "humidity": "]]..humi..[["}}}
-             ]])
+             database.insert('measurements', { air_temperature = temp,
+                air_humidity = humi})
 
          elseif status == dht.ERROR_CHECKSUM then
              print( "DHT Checksum error." )
@@ -29,6 +28,7 @@ end
 local function start_measurements()
     tmr.alarm(1, config.YL_INTERVAL, tmr.ALARM_AUTO, function()
         soil_humidity.measure()
+        barrel.has_water()
         local measure_only_mode = (gpio.read(config.MEASURE_ONLY_MODE_PIN) == 0 )
         if measure_only_mode then
             print('measure only mode')
@@ -41,6 +41,7 @@ local function start_measurements()
                     local running, mode = tmr.state(3)
                     if not running then
                         tmr.alarm(3, config.IRRIGATION_INTERVAL, tmr.ALARM_SINGLE, function()
+                            database.insert('events', { irrigation_performed = 1 })
                             soil_humidity.reset()
                             gpio.write(config.RELAY_PIN, gpio.LOW)
                         end)
@@ -49,7 +50,7 @@ local function start_measurements()
                     print("has not enough water...")
                 end
             else
-                print("has not enough measurements...")
+                print("soil humidity is irrigated (above "..config.MIN_HUMIDITY..")")
             end
         end
     end)

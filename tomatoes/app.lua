@@ -28,26 +28,37 @@ end
 local function start_measurements()
     tmr.alarm(1, config.YL_INTERVAL, tmr.ALARM_AUTO, function()
         soil_humidity.measure()
-        barrel.has_water()
+        barrel.check_water()
         local measure_only_mode = (gpio.read(config.MEASURE_ONLY_MODE_PIN) == 0 )
         if measure_only_mode then
             print('measure only mode')
         else
             if soil_humidity.need_water() then
-                if barrel.has_water() then
-                    print("has enough measurements...")
+                print("has enough measurements...")
 
-                    gpio.write(config.RELAY_PIN, gpio.HIGH)
-                    local running, mode = tmr.state(3)
-                    if not running then
-                        tmr.alarm(3, config.IRRIGATION_INTERVAL, tmr.ALARM_SINGLE, function()
-                            database.insert('events', { irrigation_performed = 1 })
-                            soil_humidity.reset()
+
+                local running, mode = tmr.state(3)
+                local series = 0
+                if not running then
+                    database.insert('events', { irrigation_started = 1 })
+                    tmr.alarm(3, config.IRRIGATION_INTERVAL, tmr.ALARM_AUTO, function()
+                        if barrel.check_water() then
+                            if series <= 2 then
+                                gpio.write(config.RELAY_PIN, gpio.HIGH)
+                                database.insert('events', { irrigation_interval_performed = 1 })
+                            else
+                                gpio.write(config.RELAY_PIN, gpio.LOW)
+                                database.insert('events', { irrigation_performed = 1 })
+                                tmr.unregister(3)
+                                soil_humidity.reset()
+                            end
+                        else
+                            database.insert('events', { not_enough_water = 1 })
                             gpio.write(config.RELAY_PIN, gpio.LOW)
-                        end)
-                    end
-                else
-                    print("has not enough water...")
+                            tmr.unregister(3)
+                        end
+                        series = series + 1
+                    end)
                 end
             else
                 print("soil humidity is irrigated (above "..config.MIN_HUMIDITY..")")

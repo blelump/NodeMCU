@@ -74,6 +74,7 @@ local function start_measurements()
 end
 
 function module.start()
+    database.insert('events', { node_started = 1 })
     measure_dht_22()
     start_measurements()
 end

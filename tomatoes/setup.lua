@@ -24,11 +24,14 @@ local function wifi_wait_ip()
   else
     stop_blinking()
     tmr.stop(1)
+    local database = require("database")
     print("\n====================================")
     print("ESP8266 mode is: " .. wifi.getmode())
     print("MAC address is: " .. wifi.ap.getmac())
     print("IP is "..wifi.sta.getip())
     print("====================================")
+    database.insert('nodes', { node_ip = '"'..wifi.sta.getip()..'"' })
+    unrequire('database')
     app.start()
   end
 end

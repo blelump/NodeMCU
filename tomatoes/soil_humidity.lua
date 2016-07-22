@@ -2,7 +2,6 @@ local module = {}
 local stats = require("stats")
 local database = require("database")
 
-
 local function mean_avg(humidity)
     module.mean_humidity = stats.compute_10_args_mean(humidity)
 end
@@ -46,6 +45,7 @@ function module.measure()
         database.insert('measurements', {soil_humidity = humidity,
             mean_soil_humidity = module.mean_humidity,
             min_soil_humidity = config.MIN_HUMIDITY,
+            heap = node.heap(),
             enough_measurements = (module.enough_measurements and 1 or 0)})
 
         gpio.write(config.YL_PIN, gpio.LOW)
